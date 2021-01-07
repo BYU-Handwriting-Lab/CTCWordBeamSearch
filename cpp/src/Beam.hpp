@@ -17,10 +17,11 @@ public:
 
 	// next possible characters and words
 	const std::vector<uint32_t>& getText() const;
+	const std::vector<uint32_t>& getFullText() const;
 	std::vector<uint32_t> getNextChars() const;
 
 	// create child beam by extending by given character
-	std::shared_ptr<Beam> createChildBeam(double prBlank, double prNonBlank, uint32_t newChar=std::numeric_limits<uint32_t>::max()) const;
+	std::shared_ptr<Beam> createChildBeam(double prBlank, double prNonBlank, uint32_t extender, uint32_t newChar=std::numeric_limits<uint32_t>::max()) const;
 
 	// merge given beam with this beam
 	void mergeBeam(const std::shared_ptr<Beam>& beam);
@@ -43,6 +44,7 @@ private:
 
 	// textual part
 	std::vector<uint32_t> m_text; // complete text of this beam
+    std::vector<uint32_t> m_textFull; // complete text of this beam including blanks and repeating characters
 	std::vector<uint32_t> m_wordDev; // currently "built" word
 	std::vector<std::vector<uint32_t>> m_wordHist; // history of words in text
 	double m_prTextTotal = 1.0;

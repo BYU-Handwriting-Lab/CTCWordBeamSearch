@@ -1,0 +1,23 @@
+package:
+  name: word_beam_search
+  version: 0.1
+
+source:
+  path: ../
+
+build:
+  number: 0
+  script: CFLAGS='-stdlib=libc++ -std=c++11' python setup.py install --single-version-externally-managed --record=record.txt
+
+requirements:
+  build:
+    - python==3.7.3
+  run:
+    - python==3.7.3
+
+test:
+  imports:
+    - word_beam_search
+
+about:
+  home: https://github.com/BYU-Handwriting-Lab

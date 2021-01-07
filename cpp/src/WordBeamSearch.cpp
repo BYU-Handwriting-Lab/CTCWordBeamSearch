@@ -8,8 +8,8 @@ std::vector<uint32_t> wordBeamSearch(const IMatrix& mat, size_t beamWidth, const
 {
 	// dim0: T, dim1: C
 	const size_t maxT = mat.rows();
-	const size_t maxC = mat.cols();
-	const size_t blank = maxC - 1;
+//	const size_t maxC = mat.cols();
+	const size_t blank = 0;
 
 	// initialise with genesis beam
 	BeamList curr;
@@ -33,7 +33,9 @@ std::vector<uint32_t> wordBeamSearch(const IMatrix& mat, size_t beamWidth, const
 
 			// calc prob that path ends with a blank
 			prBlank = beam->getTotalProb() * mat.getAt(t, blank);
-			
+
+			auto extender = (beam->getText().empty() || (mat.getAt(t, beam->getText().back()) < mat.getAt(t, blank))) ? blank : beam->getText().back();
+
 			// add copy of original beam to current time step
 			curr.addBeam(beam->createChildBeam(prBlank, prNonBlank));
 
@@ -63,8 +65,8 @@ std::vector<uint32_t> wordBeamSearch(const IMatrix& mat, size_t beamWidth, const
 
 	// return best entry
 	const auto bestBeam = last.getBestBeams(1)[0];
-	bestBeam->completeText();
-	return bestBeam->getText();
+//	bestBeam->completeText();
+	return bestBeam->getFullText();
 }
 
 

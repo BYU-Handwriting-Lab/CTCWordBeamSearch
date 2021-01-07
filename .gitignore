@@ -14,6 +14,7 @@ out.csv
 **/Release
 **/Debug
 **/.idea
+**/.DS_Store
 word_beam_search.egg-info
 build
 dist

@@ -20,6 +20,12 @@ const std::vector<uint32_t>& Beam::getText() const
 }
 
 
+const std::vector<uint32_t>& Beam::getFullText() const
+{
+    return m_textFull;
+}
+
+
 std::vector<uint32_t> Beam::getNextChars() const
 {
 	return m_lm->getNextChars(m_wordDev);
@@ -113,7 +119,7 @@ void Beam::handleNGrams(std::shared_ptr<Beam>& newBeam, uint32_t newChar) const
 }
 
 
-std::shared_ptr<Beam> Beam::createChildBeam(double prBlank, double prNonBlank, uint32_t newChar) const
+std::shared_ptr<Beam> Beam::createChildBeam(double prBlank, double prNonBlank, uint32_t extender, uint32_t newChar) const
 {
 	// copy this beam
 	std::shared_ptr<Beam> newBeam = std::make_shared<Beam>(*this);
@@ -141,7 +147,10 @@ std::shared_ptr<Beam> Beam::createChildBeam(double prBlank, double prNonBlank, u
 		// always append new char to text of beam
 		newBeam->m_text.push_back(newChar);
 	}
-	
+
+	// Always add to the text full variable which includes blanks/repeating characters
+	newBeam->m_textFull.push_back(extender);
+
 	newBeam->m_prBlank = prBlank;
 	newBeam->m_prNonBlank = prNonBlank;
 	return newBeam;
