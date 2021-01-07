@@ -193,7 +193,7 @@ void Beam::completeText()
 void BeamList::addBeam(const std::shared_ptr<Beam>& beam)
 {
 	//We are not merging beams
-	m_beams[beam->getText()] = beam;
+	m_beams.push_back(beam);
 	// if beam text already in list, merge beams, otherwise add new beam
 	/*auto iter=m_beams.find(beam->getText());
 	if (iter == m_beams.end())
@@ -210,21 +210,27 @@ void BeamList::addBeam(const std::shared_ptr<Beam>& beam)
 std::vector<std::shared_ptr<Beam>> BeamList::getBestBeams(size_t beamWidth)
 {
 	// sort by totalProb*textualProb
-	typedef std::pair<std::vector<uint32_t>, std::shared_ptr<Beam>> KeyValueType;
-	std::vector<KeyValueType> beams(m_beams.begin(), m_beams.end());
-	std::sort
-	(
-		beams.begin()
-		,beams.end()
-		,[](const KeyValueType& a, const KeyValueType& b) {return a.second->getTotalProb()*a.second->getTextualProb() > b.second->getTotalProb()*b.second->getTextualProb(); }
-	);
+	//typedef std::pair<std::vector<uint32_t>, std::shared_ptr<Beam>> KeyValueType;
+	//std::vector<KeyValueType> beams(m_beams.begin(), m_beams.end());
+
+	//There is no reason to sort the list if we are going to return all of them as it is
+	if (m_beams.size() > beamWidth)
+	{
+		//Partial heap sort would be more efficient at identifying a the top beamWidth beams
+		std::sort
+		(
+			m_beams.begin()
+			,m_beams.end()
+			,[](const std::shared_ptr<Beam> a, const std::shared_ptr<Beam> b) {return a->getTotalProb()*a->getTextualProb() > b->getTotalProb()*b->getTextualProb(); }
+		);
+	}
 
 	// take beam object (take value, ignore key) and return it
 	std::vector<std::shared_ptr<Beam>> res;
 	res.reserve(beamWidth);
-	for (size_t i = 0; i < beams.size() && i < beamWidth; ++i)
+	for (size_t i = 0; i < m_beams.size() && i < beamWidth; ++i)
 	{
-		res.push_back(beams[i].second);
+		res.push_back(m_beams[i]);
 	}
 	return res;
 }

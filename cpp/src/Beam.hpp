@@ -70,6 +70,8 @@ public:
 	std::vector<std::shared_ptr<Beam>> getBestBeams(size_t beamWidth);
 
 private:
-	std::unordered_map<std::vector<uint32_t>, std::shared_ptr<Beam>, HashFunction> m_beams;
+	//Since we are not merging identical beams, we can store them as a vector rather than a hashmap,
+	//which should improve performance
+	std::vector<std::shared_ptr<Beam>> m_beams;
 };
 
