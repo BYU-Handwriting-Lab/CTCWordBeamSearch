@@ -192,8 +192,10 @@ void Beam::completeText()
 
 void BeamList::addBeam(const std::shared_ptr<Beam>& beam)
 {
+	//We are not merging beams
+	m_beams[beam->getText()] = beam;
 	// if beam text already in list, merge beams, otherwise add new beam
-	auto iter=m_beams.find(beam->getText());
+	/*auto iter=m_beams.find(beam->getText());
 	if (iter == m_beams.end())
 	{
 		m_beams[beam->getText()] = beam;
@@ -201,7 +203,7 @@ void BeamList::addBeam(const std::shared_ptr<Beam>& beam)
 	else
 	{
 		iter->second->mergeBeam(beam);
-	}
+	}*/
 }
 
 
