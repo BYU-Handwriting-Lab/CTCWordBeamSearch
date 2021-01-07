@@ -19,11 +19,20 @@ const std::vector<uint32_t>& Beam::getText() const
 	return m_text;
 }
 
+uint32_t Beam::getLastChar() const
+{
+	return lastChar;
+}
 
-const std::vector<uint32_t>& Beam::getFullText() const
+bool Beam::isEmpty() const
+{
+	return lastChar==std::numeric_limits<uint32_t>::max(); //True iff no non-blank chars have been added
+}
+
+/*const std::vector<uint32_t>& Beam::getFullText() const
 {
     return m_textFull;
-}
+}*/
 
 
 std::vector<uint32_t> Beam::getNextChars() const
@@ -145,11 +154,13 @@ std::shared_ptr<Beam> Beam::createChildBeam(double prBlank, double prNonBlank, u
 		}
 		
 		// always append new char to text of beam
-		newBeam->m_text.push_back(newChar);
+		//newBeam->m_text.push_back(newChar);
+		newBeam->lastChar = newChar;
 	}
 
 	// Always add to the text full variable which includes blanks/repeating characters
-	newBeam->m_textFull.push_back(extender);
+	//newBeam->m_textFull.push_back(extender);
+	newBeam->m_text.push_back(extender);
 
 	newBeam->m_prBlank = prBlank;
 	newBeam->m_prNonBlank = prNonBlank;

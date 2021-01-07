@@ -17,7 +17,14 @@ public:
 
 	// next possible characters and words
 	const std::vector<uint32_t>& getText() const;
-	const std::vector<uint32_t>& getFullText() const;
+	
+	//Returns the last non CTC-blank char in the Beam
+	uint32_t getLastChar() const;
+
+	//Returns true if the Beam is empty or contains only CTC blanks
+	bool isEmpty() const;
+
+	//const std::vector<uint32_t>& getFullText() const;
 	std::vector<uint32_t> getNextChars() const;
 
 	// create child beam by extending by given character
@@ -44,7 +51,8 @@ private:
 
 	// textual part
 	std::vector<uint32_t> m_text; // complete text of this beam
-    std::vector<uint32_t> m_textFull; // complete text of this beam including blanks and repeating characters
+	uint32_t lastChar = std::numeric_limits<uint32_t>::max();
+    //std::vector<uint32_t> m_textFull; // complete text of this beam including blanks and repeating characters
 	std::vector<uint32_t> m_wordDev; // currently "built" word
 	std::vector<std::vector<uint32_t>> m_wordHist; // history of words in text
 	double m_prTextTotal = 1.0;
