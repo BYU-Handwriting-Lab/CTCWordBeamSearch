@@ -217,6 +217,35 @@ void BeamList::addBeam(const std::shared_ptr<Beam>& beam)
 	}*/
 }
 
+inline bool compare(const std::shared_ptr<Beam> a, const std::shared_ptr<Beam> b)
+{
+	return a->getTotalProb()*a->getTextualProb() > b->getTotalProb()*b->getTextualProb();
+}
+
+void swapDown(std::shared_ptr<Beam>* array, size_t i, const size_t size)
+{
+	//swap down if compare()
+	std::shared_ptr<Beam> swap = array[i];
+
+	size_t c1 = (i<<1) + 1;
+	size_t c2 = c1+1;
+
+	//while ((c2<size && compare(swap, array[c2])) || (c1<size && compare(swap, array[c1])))
+	while (c2<size ? compare(swap, array[c1]) || compare(swap, array[c2]) : c1<size && compare(swap, array[c1]))
+	{
+		//find the smallest child
+		size_t si = (c2==size || compare(array[c2], array[c1])) ? c1 : c2;
+
+		array[i] = array[si]; //shift said child into parent spot
+		i = si;
+
+		//Recalculate children indexes
+		c1 = (i<<1) + 1;
+		c2 = c1+1;
+	}
+
+	array[i] = swap; //Place starting node into empty spot cleared by shifting children up (or back where it started...)
+}
 
 std::vector<std::shared_ptr<Beam>> BeamList::getBestBeams(size_t beamWidth)
 {
@@ -225,24 +254,51 @@ std::vector<std::shared_ptr<Beam>> BeamList::getBestBeams(size_t beamWidth)
 	//std::vector<KeyValueType> beams(m_beams.begin(), m_beams.end());
 
 	//There is no reason to sort the list if we are going to return all of them as it is
+
+	std::vector<std::shared_ptr<Beam>> res;
+
 	if (m_beams.size() > beamWidth)
 	{
-		//Partial heap sort would be more efficient at identifying a the top beamWidth beams
-		std::sort
+		/*std::sort
 		(
 			m_beams.begin()
 			,m_beams.end()
 			,[](const std::shared_ptr<Beam> a, const std::shared_ptr<Beam> b) {return a->getTotalProb()*a->getTextualProb() > b->getTotalProb()*b->getTextualProb(); }
 		);
+		
+		res.reserve(beamWidth);
+		for (size_t i = 0; i < beamWidth; ++i) res.push_back(m_beams[i]);
+		//*/
+
+		//Partial heap sort would be more efficient at identifying a the top beamWidth beams
+		std::shared_ptr<Beam>* heap = new std::shared_ptr<Beam>[beamWidth];
+
+		//Build min heap of size beamsWidth
+		for (size_t i = 0; i < beamWidth; ++i) heap[i] = m_beams[i];
+		for (int i = beamWidth - 1>>1; i>=0; --i) swapDown(heap, i, beamWidth);
+
+		//Iterate through the rest of the Beams, if a beam is larger than the min of the heap
+		//Replace the min with it and swap it down
+		for (int i = beamWidth+1; i<m_beams.size(); ++i) if (compare(m_beams[i], heap[0]))
+		{
+			heap[0] = m_beams[i];
+			swapDown(heap, 0, beamWidth);
+		}
+
+		//The heap now represents the top beamWidth Beams from the list without sorting it
+
+		res.reserve(beamWidth);
+		for (size_t i = 0; i < beamWidth; ++i) res.push_back(heap[i]);
+
+		delete[] heap;//*/
+
+		return res;
 	}
 
 	// take beam object (take value, ignore key) and return it
-	std::vector<std::shared_ptr<Beam>> res;
-	res.reserve(beamWidth);
-	for (size_t i = 0; i < m_beams.size() && i < beamWidth; ++i)
-	{
-		res.push_back(m_beams[i]);
-	}
+	res.reserve(m_beams.size());
+	for (size_t i = 0; i < m_beams.size() && i < beamWidth; ++i) res.push_back(m_beams[i]);
+
 	return res;
 }
 
