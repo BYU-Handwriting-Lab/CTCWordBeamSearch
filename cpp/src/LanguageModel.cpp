@@ -10,6 +10,11 @@ LanguageModel::LanguageModel(const std::string& corpus, const std::string& chars
 :m_addK(addK)
 {
 	m_labelToCodepoint=utf8ToCodepoint(chars);
+	//std::cout << "POINT Z: " << m_labelToCodepoint[0] << std::endl;
+	//std::cout << "NUM CHARS: " << m_labelToCodepoint.size() << std::endl;
+	m_labelToCodepoint.insert(m_labelToCodepoint.begin(), 1); //Shift chars indexes since CTC-Blank is first
+	//std::cout << "POINT Z: " << m_labelToCodepoint[0] << std::endl;
+	//std::cout << "NUM CHARS: " << m_labelToCodepoint.size() << std::endl;
 	m_codepointToLabel = codepointToLabelMapping(m_labelToCodepoint);
 	const auto wordCodepoints = utf8ToCodepoint(wordChars);
 	initLabelSets(m_codepointToLabel, wordCodepoints);
@@ -36,6 +41,7 @@ LanguageModel::LanguageModel(const std::string& corpus, const std::string& chars
 
 
 	// calc unigram, add words to tree
+	//TODO: IF NO LANGUAGE MODEL, CUT UNIGRAMS CALCULATION
 	const double wordWeight = 1.0 / wordList.size();
 	for (const auto& w : wordList)
 	{
@@ -112,10 +118,13 @@ std::vector<uint32_t> LanguageModel::utf8ToCodepoint(const std::string& s)
 std::unordered_map<uint32_t, uint32_t> LanguageModel::codepointToLabelMapping(const std::vector<uint32_t>& charsCP)
 {
 	std::unordered_map<uint32_t, uint32_t> res;
-	for (size_t i = 0; i < charsCP.size(); ++i)
+	//for (size_t i = 0; i < charsCP.size(); ++i)
+	for (size_t i = 1; i < charsCP.size(); ++i) //SHIFT INDEXES BY ONE SINCE ARE STARTING WITH CTC-BLANK AT 0
 	{
 		res[charsCP[i]] = static_cast<uint32_t>(i);
+		//std::cout << "POINT X: " << i << std::endl;
 	}
+	//std::cout << "POINT k: " << res.size() << std::endl;
 
 	return res;
 }
@@ -218,6 +227,10 @@ void LanguageModel::initLabelSets(const std::unordered_map<uint32_t, uint32_t>& 
 		const uint32_t codepoint = kv.first;
 		const uint32_t label = kv.second;
 
+		//std::cout << codepoint << ':' << label << std::endl; 
+
+		if (label==0) continue; //Skip the filler for CTC-loss
+
 		// word char
 		if (std::find(wordCodepoints.begin(), wordCodepoints.end(), codepoint)!= wordCodepoints.end())
 		{
@@ -231,6 +244,7 @@ void LanguageModel::initLabelSets(const std::unordered_map<uint32_t, uint32_t>& 
 
 		m_allLabels.insert(label);
 	}
+	std::cout << "POINT L: " << m_wordLabels.size() << ' ' << m_nonWordLabels.size() << ' ' << m_allLabels.size() << std::endl;
 }
 
 

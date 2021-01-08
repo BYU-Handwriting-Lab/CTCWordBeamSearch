@@ -11,6 +11,8 @@
 #include "WordBeamSearch.hpp"
 #include "LanguageModel.hpp"
 
+#include <iostream>
+
 
 namespace py = pybind11;
 
@@ -53,6 +55,7 @@ public:
 			throw std::invalid_argument("unknown LM type (lmType)");
 		}
 
+
 		// create language model
 		m_lm = std::make_shared<LanguageModel>(corpus, chars, wordChars, m_lmType, lmSmoothing);
 
@@ -73,9 +76,12 @@ public:
 	std::vector<std::vector<uint32_t>> compute(const py::array_t<double, py::array::c_style | py::array::forcecast>& array) const
 	{
 		py::buffer_info buf = array.request();
-		const size_t maxT = buf.shape[0];
-		const size_t maxB = buf.shape[1];
+		//FLIP THE BATCH AND TIME STEP DIMENSIONS
+		const size_t maxB = buf.shape[0];
+		const size_t maxT = buf.shape[1];
 		const size_t maxC = buf.shape[2];
+
+		//std::cout << maxB << ' ' << maxT << ' ' << maxC << ' ' << m_numChars << std::endl;
 
 		// check tensor size
 		if (maxC != m_numChars + 1)
@@ -89,6 +95,8 @@ public:
 		{
 			// wrapper around Tensor
 			MatrixArray mat(array, b, maxT, maxC);
+
+			//std::cout << "POINT A: " << b << std::endl;
 
 			// apply decoding algorithm to batch element 
 			res.push_back(wordBeamSearch(mat, m_beamWidth, m_lm, m_lmType));

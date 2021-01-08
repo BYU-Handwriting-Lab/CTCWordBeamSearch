@@ -18,7 +18,7 @@ public:
 
 	virtual double getAt(size_t row, size_t col) const
 	{	
-		return m_array.at(row, m_batch, col);
+		return m_array.at(m_batch, row, col); //SWAP THE BATCH AND TIMESTEP DIMENSIONS
 	}
 	
 	virtual void setAt(size_t row, size_t col, double val)
