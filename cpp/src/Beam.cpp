@@ -275,7 +275,7 @@ std::vector<std::shared_ptr<Beam>> BeamList::getBestBeams(size_t beamWidth)
 
 		//Build min heap of size beamsWidth
 		for (size_t i = 0; i < beamWidth; ++i) heap[i] = m_beams[i];
-		for (int i = beamWidth - 1>>1; i>=0; --i) swapDown(heap, i, beamWidth);
+		for (int i = beamWidth - 2>>1; i>=0; --i) swapDown(heap, i, beamWidth);
 
 		//Iterate through the rest of the Beams, if a beam is larger than the min of the heap
 		//Replace the min with it and swap it down
