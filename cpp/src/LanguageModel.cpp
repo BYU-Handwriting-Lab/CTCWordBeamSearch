@@ -244,7 +244,7 @@ void LanguageModel::initLabelSets(const std::unordered_map<uint32_t, uint32_t>& 
 
 		m_allLabels.insert(label);
 	}
-	std::cout << "POINT L: " << m_wordLabels.size() << ' ' << m_nonWordLabels.size() << ' ' << m_allLabels.size() << std::endl;
+	//std::cout << "POINT L: " << m_wordLabels.size() << ' ' << m_nonWordLabels.size() << ' ' << m_allLabels.size() << std::endl;
 }
 
 
