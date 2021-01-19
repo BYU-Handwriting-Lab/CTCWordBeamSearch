@@ -17,7 +17,14 @@ public:
 
 	// next possible characters and words
 	const std::vector<uint32_t>& getText() const;
-	const std::vector<uint32_t>& getFullText() const;
+	
+	//Returns the last non CTC-blank char in the Beam
+	uint32_t getLastChar() const;
+
+	//Returns true if the Beam is empty or contains only CTC blanks
+	bool isEmpty() const;
+
+	//const std::vector<uint32_t>& getFullText() const;
 	std::vector<uint32_t> getNextChars() const;
 
 	// create child beam by extending by given character
@@ -44,7 +51,8 @@ private:
 
 	// textual part
 	std::vector<uint32_t> m_text; // complete text of this beam
-    std::vector<uint32_t> m_textFull; // complete text of this beam including blanks and repeating characters
+	uint32_t lastChar = std::numeric_limits<uint32_t>::max();
+    //std::vector<uint32_t> m_textFull; // complete text of this beam including blanks and repeating characters
 	std::vector<uint32_t> m_wordDev; // currently "built" word
 	std::vector<std::vector<uint32_t>> m_wordHist; // history of words in text
 	double m_prTextTotal = 1.0;
@@ -70,6 +78,8 @@ public:
 	std::vector<std::shared_ptr<Beam>> getBestBeams(size_t beamWidth);
 
 private:
-	std::unordered_map<std::vector<uint32_t>, std::shared_ptr<Beam>, HashFunction> m_beams;
+	//Since we are not merging identical beams, we can store them as a vector rather than a hashmap,
+	//which should improve performance
+	std::vector<std::shared_ptr<Beam>> m_beams;
 };
 
